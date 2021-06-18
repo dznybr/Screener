@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Binance</title>
+</head>
+<body>
+    Websocket
+    <script>
+        var HttpsProxyAgent = require('https-proxy-agent');
+        var agent = new HttpsProxyAgent({
+            protocol: 'https',
+            host: '10.240.33.24',
+            port: '3000'
+        });
+
+        var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/tfuelusdt@kline5m", { agent: agent });
+
+        binanceSocket.onmessage = function (event) {
+            console.log(event.data);
+        }
+    </script>
+</body>
+</html>
