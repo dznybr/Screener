@@ -40,7 +40,7 @@
         <tr>
             <td> {{ stock }} </td>
             <td> {{ stocks[stock]['company'] }} </td>
-            <td> {{ stocks[stock]['patterns'][current_pattern] }}: {{ stocks[stock]['signal'] }} </td>
+            <td class={{ stocks[stock]['patterns'][current_pattern] }} > {{ stocks[stock]['patterns'][current_pattern] }}: {{ stocks[stock]['signal'] }} </td>
             <td> - </td>
 <!--            <td rowspan="2">{{ stocks[stock]['patterns'] }}</td>-->
         </tr>

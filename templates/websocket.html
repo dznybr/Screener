@@ -2,23 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <title>Binance</title>
 </head>
 <body>
-    Websocket
+    <h2>Websocket</h2>
+
+    <div id="chart"></div>
+    <div id="trades"></div>
+
+    <h3>Settings</h3>
+    <div id="settings"></div>
+        <input type="checkbox" /> RSI
+        length
+        <input type="text" id="rsi_length" name="rsi_length" placeholder="14" />
+        oversold
+        <input type="text" id="rsi_oversold" name="rsi_oversold" placeholder="30" />
+        overbought
+        <input type="text" id="rsi_overbought" name="rsi_overbought" placeholder="70" />
     <script>
-        var HttpsProxyAgent = require('https-proxy-agent');
-        var agent = new HttpsProxyAgent({
-            protocol: 'https',
-            host: '10.240.33.24',
-            port: '3000'
-        });
 
-        var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/tfuelusdt@kline5m", { agent: agent });
-
+        var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/tfuelusdt@kline_1m");
+        var tradeDiv = document.getElementById("trades")
         binanceSocket.onmessage = function (event) {
             console.log(event.data);
-        }
+
+            var messageObject = JSON.parse(event.data);
+<!--            tradeDiv.append(messageObject.k.L);-->
+        };
+    </script>
+    <script src="chart.js">
+
     </script>
 </body>
 </html>
