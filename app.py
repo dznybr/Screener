@@ -38,6 +38,7 @@ def index():
                     stocks[symbol]['signal'] = last
                 else:
                     stocks[symbol]['patterns'][pattern] = None
+                    stocks[symbol]['signal'] = last
             except:
                 pass
 
@@ -45,7 +46,7 @@ def index():
 
 @app.route('/multi')
 def multi():
-    current_pattern = request.args.get('pattern', None)
+    current_pattern = request.args.get('pattern', 'ALL')
     stocks = {}
 
     with open('datasets/companies.csv') as f:
@@ -55,31 +56,35 @@ def multi():
     datafiles = os.listdir('datasets/daily')
     for filename in datafiles:
         df = pd.read_csv(f'datasets/daily/{filename}')
+        stock = filename.split('.csv')[0]
+        if stocks.get(stock, None) is None:
+            continue
 
         for i, pattern in enumerate(patterns):
             pattern_function = getattr(talib, pattern)
 
-            symbol = filename.split('.csv')[0]
             try:
                 result = pattern_function(df['Open'], df['High'], df['Low'], df['Close'])
                 last = result.tail(1).values[0]
                 if last > 0:
-                    stocks[symbol]['patterns'][pattern] = 'bullish'
-                    stocks[symbol]['signal'] += 100 if pattern == current_pattern else 1
+                    stocks[stock]['patterns'][pattern] = 'bullish'
+                    stocks[stock]['signal'] += 100 if pattern == current_pattern else 1
                 elif last < 0:
-                    stocks[symbol]['patterns'][pattern] = 'bearish'
-                    stocks[symbol]['signal'] -= 100 if pattern == current_pattern else 1
+                    stocks[stock]['patterns'][pattern] = 'bearish'
+                    stocks[stock]['signal'] -= 100 if pattern == current_pattern else 1
                 else:
-                    stocks[symbol]['patterns'][pattern] = None
+                    stocks[stock]['patterns'][pattern] = None
             except:
                 pass
 
-        print(f'{symbol}: {stocks[symbol]["signal"]}')
+        stocks[stock]['patterns'] = {k: stocks[stock]['patterns'][k] for i, k in enumerate(stocks[stock]['patterns']) if not stocks[stock]['patterns'][k] is None}
+        stocks[stock]['patterns']['ALL'] = 'bullish' if stocks[stock]['signal'] > 0 else 'bearish'
 
-    stocks = sorted(stocks.items(), key=lambda x: x[1]['signal'], reverse=True)
+        print(f'{stock}: {stocks[stock]}')
 
-    for k in stocks:
-        print(f'{k}')
+    stocks = {k: stocks[k] for i, k in enumerate(stocks) if stocks[k]['signal'] != 0}
+
+    stocks = dict(sorted(stocks.items(), key=lambda x: x[1]['signal'], reverse=True))
 
     return render_template('index.html', patterns=patterns, stocks=stocks, current_pattern=current_pattern)
 
