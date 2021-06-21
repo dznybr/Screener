@@ -78,6 +78,9 @@ def multi():
 
     stocks = sorted(stocks.items(), key=lambda x: x[1]['signal'], reverse=True)
 
+    for k in stocks:
+        print(f'{k}')
+
     return render_template('index.html', patterns=patterns, stocks=stocks, current_pattern=current_pattern)
 
 
