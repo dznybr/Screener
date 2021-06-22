@@ -10,7 +10,6 @@ from settings import proxies
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
     pattern = request.args.get('pattern', None)
@@ -103,6 +102,14 @@ def snapshot():
     return {
         'code': 'success'
     }
+
+@app.route('/chart')
+def chart():
+    return render_template('chart.html')
+
+@app.route('/settings')
+def settings():
+    return 'settings'
 
 
 if __name__ == '__main__':

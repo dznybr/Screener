@@ -4,8 +4,6 @@ var chart = LightweightCharts.createChart(document.getElementById("chart"), {
 	layout: {
 		backgroundColor: '#FFFFFF',
 		textColor: 'rgba(0, 0, 0, 0.9)',
-//		backgroundColor: '#000000',
-//		textColor: 'rgba(255, 255, 255, 0.9)',
 	},
 	grid: {
 		vertLines: {
@@ -27,14 +25,8 @@ var chart = LightweightCharts.createChart(document.getElementById("chart"), {
 });
 
 var candleSeries = chart.addCandlestickSeries({
-//  upColor: 'rgba(255, 144, 0, 1)',
-//  downColor: '#000',
   upColor: 'green',
   downColor: 'red',
-//  borderDownColor: 'rgba(255, 144, 0, 1)',
-//  borderUpColor: 'rgba(255, 144, 0, 1)',
-//  wickDownColor: 'rgba(255, 144, 0, 1)',
-//  wickUpColor: 'rgba(255, 144, 0, 1)',
   borderDownColor: 'red',
   borderUpColor: 'green',
   wickDownColor: 'red',
