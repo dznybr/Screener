@@ -123,8 +123,11 @@ def settings():
 
 @app.route('/history')
 def history():
+    print('history')
 
     candlesticks = client.get_historical_klines('BTCUSDT', Client.KLINE_INTERVAL_15MINUTE, '23 Jun, 2021', '24 Jun, 2021')
+
+    print('candlesticks got')
     processed_candlesticks = []
 
     for data in candlesticks:
