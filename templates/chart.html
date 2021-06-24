@@ -9,29 +9,42 @@
     <h2>Websocket</h2>
 
     <div id="chart"></div>
+<!--        <input type="text" id="quantity" name="quantity" placeholder="eg. 0.001" />-->
+<!--        <select id="symbol" name="symbol">-->
+<!--            {% for symbol in symbols %}-->
+<!--                <option>{{ symbol['symbol'] }}</option>-->
+<!--            {% endfor %}-->
+<!--        </select>-->
+<!--        <input type="submit" name="buy" value="buy"/>-->
     <div id="trades"></div>
 
     <h3>Settings</h3>
-    <div id="settings"></div>
-        <input type="checkbox" /> RSI
-        length
-        <input type="text" id="rsi_length" name="rsi_length" placeholder="14" />
-        oversold
-        <input type="text" id="rsi_oversold" name="rsi_oversold" placeholder="30" />
-        overbought
-        <input type="text" id="rsi_overbought" name="rsi_overbought" placeholder="70" />
-    <script>
+<!--    <div id="settings">-->
+<!--        <form action="/settings" method="post">-->
+<!--            <input type="checkbox" id="rsi"/> RSI-->
+<!--            length-->
+<!--            <input type="text" id="rsi_length" name="rsi_length" placeholder="14" />-->
+<!--            oversold-->
+<!--            <input type="text" id="rsi_oversold" name="rsi_oversold" placeholder="30" />-->
+<!--            overbought-->
+<!--            <input type="text" id="rsi_overbought" name="rsi_overbought" placeholder="70" />-->
+<!--            <input type="submit" name="save" value="save_settings"/>-->
+<!--        </form>-->
+<!--        <div>-->
+<!--            {% with messages = get_flashed_messages %}-->
+<!--                {% if messages %}-->
+<!--                    <div style="padding: 10px; background: pink; border: solid red 1px; color: red; margin-top: 10px">-->
+<!--                        {% for message in messages %}-->
+<!--                            {{ message }}-->
+<!--                        {% endfor %}-->
+<!--                    </div>-->
+<!--                {% endif %}-->
+<!--            {% endwith %}-->
+<!--        </div>-->
+<!--    </div>-->
 
-<!--        var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/tfuelusdt@kline_1m");-->
-<!--        var tradeDiv = document.getElementById("trades")-->
-<!--        binanceSocket.onmessage = function (event) {-->
-<!--            console.log(event.data);-->
-
-<!--            var messageObject = JSON.parse(event.data);-->
-<!--&lt;!&ndash;            tradeDiv.append(messageObject.k.L);&ndash;&gt;-->
-<!--        };-->
-    </script>
     <script src= {{ url_for("static", filename="chart.js") }} >
+            console.log('set chart.js');
 
     </script>
 </body>

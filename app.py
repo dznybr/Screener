@@ -3,12 +3,17 @@ import yfinance as yf
 import pandas as pd
 import talib
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, flash, jsonify
 from patterns import patterns
+from binance.client import Client
+from binance.enums import *
 
-from settings import proxies
+from settings import proxies, api_key, secret_key
 
 app = Flask(__name__)
+app.secret_key = r'aslkfjqkorfalskdfmalskerjlsdfmksdfmtuj63wrtjkryiu'
+
+client = Client(api_key, secret_key, {'proxies': proxies})
 
 @app.route('/')
 def index():
@@ -67,10 +72,10 @@ def multi():
                 last = result.tail(1).values[0]
                 if last > 0:
                     stocks[stock]['patterns'][pattern] = 'bullish'
-                    stocks[stock]['signal'] += 100 if pattern == current_pattern else 1
+                    stocks[stock]['signal'] += last if pattern == current_pattern else int(last/100)
                 elif last < 0:
                     stocks[stock]['patterns'][pattern] = 'bearish'
-                    stocks[stock]['signal'] -= 100 if pattern == current_pattern else 1
+                    stocks[stock]['signal'] += last if pattern == current_pattern else -int(last/100)
                 else:
                     stocks[stock]['patterns'][pattern] = None
             except:
@@ -94,7 +99,7 @@ def snapshot():
         companies = f.read().splitlines()
         for company in companies:
             symbol = company.split(',')[0]
-            df = yf.download(symbol, start="2021-01-01", end="2021-06-18", proxy=proxies)
+            df = yf.download(symbol, start="2021-01-01", end="2021-06-01", proxy=proxies)
             filename = 'datasets/daily/{}.csv'.format(symbol)
             df.to_csv(filename)
             print(f'File {filename} saved')
@@ -105,12 +110,34 @@ def snapshot():
 
 @app.route('/chart')
 def chart():
+    print('chart')
     return render_template('chart.html')
 
 @app.route('/settings')
 def settings():
-    return 'settings'
 
+    flash(request.form, 'error')
+    print('settings')
+
+    return redirect('/chart')
+
+@app.route('/history')
+def history():
+
+    candlesticks = client.get_historical_klines('BTCUSDT', Client.KLINE_INTERVAL_15MINUTE, '23 Jun, 2021', '24 Jun, 2021')
+    processed_candlesticks = []
+
+    for data in candlesticks:
+        candlestick = {
+            'time': int(data[0]/1000),
+            'open': data[1],
+            'high': data[2],
+            'low':  data[3],
+            'close': data[4],
+        }
+        processed_candlesticks.append(candlestick)
+
+    return jsonify(processed_candlesticks)
 
 if __name__ == '__main__':
     app.run()
