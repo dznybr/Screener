@@ -99,6 +99,7 @@ def snapshot():
         companies = f.read().splitlines()
         for company in companies:
             symbol = company.split(',')[0]
+            print(symbol)
             df = yf.download(symbol, start="2021-01-01", end="2021-08-30", proxy=proxies)
             filename = 'datasets/daily/{}.csv'.format(symbol)
             df.to_csv(filename)
