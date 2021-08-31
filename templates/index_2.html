@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: arial; margin: 20px }
+        td { padding: 5px, border: 1px }
+        .bullish {background: green; color: white}
+        .bearish {background: red; color: white}
+    </style>
+    <title>Title</title>
+</head>
+<body>
+    <h1>RSI & MACD screener</h1>
+    <form>
+        <select name="pattern">
+            <option value="RSI_MACD" {% if pattern == current_pattern %} selected="selected" {% endif %}>RSI+MACD</option>
+        </select>
+        <input type="submit" value="scan">
+    </form>
+    <table>
+        <tr>
+            <th>
+                symbol
+            </th>
+            <th>
+                company name
+            </th>
+            <th>
+                RSI
+            </th>
+            <th>
+                MACD
+            </th>
+            <th>
+                MACD signal
+            </th>
+        </tr>
+    {% for stock in stocks %}
+        <tr>
+            <td> {{ stock }} </td>
+            <td> {{ stocks[stock]["company"] }} </td>
+            <td> {{ stocks[stock]["rsi"] }} </td>
+            <td> {{ stocks[stock]["macd"] }} </td>
+            <td> {{ stocks[stock]["macdsignal"] }} </td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <img src='http://finviz.com/chart.ashx?t={{ stock }}&ty=c&ta=1&p=d&s=l' />
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+</body>
+</html>

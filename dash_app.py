@@ -12,7 +12,7 @@ class RSIStrategy(bt.Strategy):
     macd_signal = False
 
     period = 0
-    take_profit = 5
+    take_profit = 10
     stop_loss = 2
 
     def __init__(self):
@@ -33,11 +33,13 @@ class RSIStrategy(bt.Strategy):
             self.rsi_signal = False
             self.macd_signal = False
 
-        if self.position:
-            if self.last_sig_price < self.data.close[0]:
-                self.last_sig_price = self.data.close[0]
+        # if self.position:
+        #     if self.last_sig_price < self.data.close[0]:
+        #         self.last_sig_price = self.data.close[0]
 
-        if self.position and (self.data.close > self.last_sig_price * (100 + self.take_profit) / 100 or
+        if self.position and (self.rsi >= 61 or
+                              self.macd.macdsignal[-1] <= self.macd.macd[-1] and self.macd.macdsignal >= self.macd.macd or
+                              self.data.close > self.last_sig_price * (100 + self.take_profit) / 100 or
                               self.data.close < self.last_sig_price * (100 - self.stop_loss) / 100):
             self.close()
             self.last_sig_price = 0
@@ -54,7 +56,7 @@ class RSIStrategy(bt.Strategy):
 cerebro = bt.Cerebro()
 cerebro.addstrategy(RSIStrategy)
 
-data = bt.feeds.GenericCSVData(dataname='datasets/daily/T.csv', dtformat='%Y-%m-%d')
+data = bt.feeds.GenericCSVData(dataname='datasets/daily/PFE.csv', dtformat='%Y-%m-%d')
 cerebro.adddata(data)
 cerebro.run()
 cerebro.plot(iplot=False)

@@ -92,6 +92,48 @@ def multi():
 
     return render_template('index.html', patterns=patterns, stocks=stocks, current_pattern=current_pattern)
 
+@app.route('/search')
+def search():
+    pattern = request.args.get('pattern', 'RSI_MACD')
+    stocks = {}
+    stocks_list = {}
+
+    with open('datasets/companies.csv') as f:
+        for row in csv.reader(f):
+            stocks_list[row[0]] = row[1]
+
+    if pattern == 'RSI_MACD':
+        datafiles = os.listdir('datasets/daily')
+        for filename in datafiles:
+            df = pd.read_csv(f'datasets/daily/{filename}')
+
+            try:
+                rsi = talib.RSI(df.close, period=14)
+                macd = talib.MACD(df.close, fastperiod=12, slowperiod=26, signalperiod=9)
+
+                rsi_signal = False
+                macd_signal = False
+
+                if macd.macdsignal[-1] >= macd.macd[-1] and macd.macdsignal[0] <= macd.macd[0]:
+                    macd_signal = True
+
+                if rsi[0] <= 41:
+                    rsi_signal = True
+
+                symbol = filename.split('.csv')[0]
+
+                if rsi_signal or macd_signal:
+                    stocks[symbol] = {'company': stocks_list[symbol],
+                                      'macd': macd.macd[0],
+                                      'macdsignal': macd.macdsignal[0], rsi: rsi[0]
+                                      }
+
+                    print(f'Company {symbol}: rsi - {rsi}, macd - {macd}, macd - {macd} ')
+
+            except:
+                pass
+
+    return render_template('index_2.html', patterns=patterns, stocks=stocks, current_pattern=pattern)
 
 @app.route('/snapshot')
 def snapshot():
@@ -100,7 +142,7 @@ def snapshot():
         for company in companies:
             symbol = company.split(',')[0]
             print(symbol)
-            df = yf.download(symbol, start="2021-01-01", end="2021-08-30", proxy=proxies)
+            df = yf.download(symbol, start="2021-01-01", end="2021-09-01", proxy=proxies)
             filename = 'datasets/daily/{}.csv'.format(symbol)
             df.to_csv(filename)
             print(f'File {filename} saved')
