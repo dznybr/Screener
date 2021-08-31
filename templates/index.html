@@ -14,7 +14,7 @@
     <h1>Candlestck screener</h1>
     <form>
         <select name="pattern">
-            <option value="ALL" {% if pattern == current_pattern %} selected="selected" {% endif %}>All patterns</option>
+            <option value="ALL" {% if current_pattern=="ALL" %} selected="selected" {% endif %}>All patterns</option>
             {% for pattern in patterns %}
                 <option value="{{ pattern }}" {% if pattern == current_pattern %} selected="selected" {% endif %}>{{ patterns[pattern] }}</option>
             {% endfor %}

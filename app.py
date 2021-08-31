@@ -92,48 +92,109 @@ def multi():
 
     return render_template('index.html', patterns=patterns, stocks=stocks, current_pattern=current_pattern)
 
-@app.route('/search')
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    pattern = request.args.get('pattern', 'RSI_MACD')
+
+    pattern = request.args.get('pattern', 'RSI_MACD_LONG')
     stocks = {}
     stocks_list = {}
+    params = {}
 
     with open('datasets/companies.csv') as f:
         for row in csv.reader(f):
             stocks_list[row[0]] = row[1]
 
-    if pattern == 'RSI_MACD':
+    if pattern == 'RSI_MACD_LONG' or pattern == 'RSI_MACD_SHORT':
+
+        interval = request.form.get("interval")
+        interval = 6 if interval is None else int(interval)
+
+        rsi_length = int(request.form.get("rsi_length", 14))
+        rsi_oversold = int(request.form.get("rsi_oversold", 30))
+        rsi_overbought = int(request.form.get("rsi_overbought", 70))
+
+        macd_fast = int(request.form.get("macd_fast", 12))
+        macd_slow = int(request.form.get("macd_slow", 26))
+        mac_signal = int(request.form.get("mac_signal", 9))
+
+        params['interval'] = interval
+        params['rsi_length'] = rsi_length
+        params['rsi_oversold'] = rsi_oversold
+        params['rsi_overbought'] = rsi_overbought
+        params['macd_fast'] = macd_fast
+        params['macd_slow'] = macd_slow
+        params['mac_signal'] = mac_signal
+
+        print(f'interval {interval}')
+
+        print(f'rsi_length {rsi_length}')
+        print(f'rsi_oversold {rsi_oversold}')
+        print(f'rsi_overbought {rsi_overbought}')
+
+        print(f'macd_fast {macd_fast}')
+        print(f'macd_slow {macd_slow}')
+        print(f'mac_signal {mac_signal}')
+
         datafiles = os.listdir('datasets/daily')
         for filename in datafiles:
+
             df = pd.read_csv(f'datasets/daily/{filename}')
+            if df.empty:
+                continue
 
-            try:
-                rsi = talib.RSI(df.close, period=14)
-                macd = talib.MACD(df.close, fastperiod=12, slowperiod=26, signalperiod=9)
+            symbol = filename.split('.csv')[0]
 
-                rsi_signal = False
-                macd_signal = False
+            rsi = talib.RSI(df['Close'], timeperiod=rsi_length)
+            macd, macdsignal, _ = talib.MACD(df['Close'], fastperiod=macd_fast, slowperiod=macd_slow, signalperiod=mac_signal)
 
-                if macd.macdsignal[-1] >= macd.macd[-1] and macd.macdsignal[0] <= macd.macd[0]:
+            rsi_signal = False
+            macd_signal = False
+
+            rsi_value = 0
+            macd_value = 0
+            macdsignal_value = 0
+
+            rsi_offset = 0
+            macd_offset = 0
+
+#            try:
+            for i in range(1, interval+1):
+
+                current_macd = macd[len(macd)-i]
+                current_macdsignal = macdsignal[len(macd)-i]
+
+                previous_macd = macd[len(macd)-i-1]
+                previous_macdsignal = macdsignal[len(macd)-i-1]
+
+                if pattern == 'RSI_MACD_LONG' and previous_macdsignal >= previous_macd and current_macdsignal <= current_macd or \
+                   pattern == 'RSI_MACD_SHORT' and previous_macdsignal <= previous_macd and current_macdsignal >= current_macd :
                     macd_signal = True
+                    macd_value = current_macd
+                    macdsignal_value = current_macdsignal
+                    macd_offset = 1-i
 
-                if rsi[0] <= 41:
+                current_rsi = rsi[len(rsi)-i]
+                if pattern == 'RSI_MACD_LONG' and current_rsi < rsi_oversold or \
+                   pattern == 'RSI_MACD_SHORT' and current_rsi > rsi_overbought:
                     rsi_signal = True
+                    rsi_value = current_rsi
+                    rsi_offset = 1-i
 
-                symbol = filename.split('.csv')[0]
+            if rsi_signal and macd_signal:
+                stocks[symbol] = {'company': stocks_list[symbol],
+                                  'macd': macd_value,
+                                  'macdsignal': macdsignal_value,
+                                  'macd_offset': macd_offset,
+                                  'rsi': rsi_value,
+                                  'rsi_offset': rsi_offset
+                                  }
 
-                if rsi_signal or macd_signal:
-                    stocks[symbol] = {'company': stocks_list[symbol],
-                                      'macd': macd.macd[0],
-                                      'macdsignal': macd.macdsignal[0], rsi: rsi[0]
-                                      }
+                print(f'Company {symbol}: rsi{rsi_offset} - {rsi_value}, macd{macd_offset} - {macd_value}, macdsignal{macd_offset} - {macdsignal_value} ')
 
-                    print(f'Company {symbol}: rsi - {rsi}, macd - {macd}, macd - {macd} ')
+#            except:
+#                pass
 
-            except:
-                pass
-
-    return render_template('index_2.html', patterns=patterns, stocks=stocks, current_pattern=pattern)
+    return render_template('index_2.html', patterns=patterns, stocks=stocks, current_pattern=pattern, params=params)
 
 @app.route('/snapshot')
 def snapshot():

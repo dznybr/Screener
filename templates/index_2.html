@@ -12,9 +12,35 @@
 </head>
 <body>
     <h1>RSI & MACD screener</h1>
+    <h3>Settings</h3>
+    <div id="settings"></div>
+        <h4>RSI</h4>
+        length
+        <input type="text" id="rsi_length" name="rsi_length" placeholder="14" value={{ params["rsi_length"] }} />
+        oversold
+        <input type="text" id="rsi_oversold" name="rsi_oversold" placeholder="30" value={{ params["rsi_oversold"] }} />
+        overbought
+        <input type="text" id="rsi_overbought" name="rsi_overbought" placeholder="70" value={{ params["rsi_overbought"] }} />
+
+        <h4>MACD</h4>
+        fast
+        <input type="text" id="macd_fast" name="macd_fast" placeholder="12" value={{ params["macd_fast"] }} />
+        slow
+        <input type="text" id="macd_slow" name="macd_slow" placeholder="26" value={{ params["macd_slow"] }} />
+        signal
+        <input type="text" id="mac_signal" name="mac_signal" placeholder="9" value={{ params["mac_signal"] }} />
+
+        <h4>Interval</h4>
+        between RSI & MACD
+        <input type="text" id="interval" name="interval" placeholder="6" value={{ params["interval"] }} />
+
+
+    <h3>Patterns</h3>
+    <div id="patterns"></div>
     <form>
         <select name="pattern">
-            <option value="RSI_MACD" {% if pattern == current_pattern %} selected="selected" {% endif %}>RSI+MACD</option>
+            <option value="RSI_MACD_LONG" {% if current_pattern=="RSI_MACD_LONG" %} selected="selected" {% endif %}>RSI+MACD (buy)</option>
+            <option value="RSI_MACD_SHORT" {% if current_pattern=="RSI_MACD_SHORT" %} selected="selected" {% endif %}>RSI+MACD (sell)</option>
         </select>
         <input type="submit" value="scan">
     </form>
@@ -40,9 +66,9 @@
         <tr>
             <td> {{ stock }} </td>
             <td> {{ stocks[stock]["company"] }} </td>
-            <td> {{ stocks[stock]["rsi"] }} </td>
-            <td> {{ stocks[stock]["macd"] }} </td>
-            <td> {{ stocks[stock]["macdsignal"] }} </td>
+            <td> ( {{ stocks[stock]["rsi_offset"] }} ) {{ stocks[stock]["rsi"] }} </td>
+            <td> ( {{ stocks[stock]["macd_offset"] }} ) {{ stocks[stock]["macd"] }} </td>
+            <td> ( {{ stocks[stock]["macd_offset"] }} ) {{ stocks[stock]["macdsignal"] }} </td>
         </tr>
         <tr>
             <td colspan="5">
