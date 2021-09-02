@@ -37,7 +37,7 @@
 
     <h3>Patterns</h3>
     <div id="patterns"></div>
-    <form>
+    <form method="POST">
         <select name="pattern">
             <option value="RSI_MACD_LONG" {% if current_pattern=="RSI_MACD_LONG" %} selected="selected" {% endif %}>RSI+MACD (buy)</option>
             <option value="RSI_MACD_SHORT" {% if current_pattern=="RSI_MACD_SHORT" %} selected="selected" {% endif %}>RSI+MACD (sell)</option>
